@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * PHP Search Engine Project
  *
  * @copyright 2020 Joshua Crocker

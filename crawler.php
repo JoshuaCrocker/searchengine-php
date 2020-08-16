@@ -1,5 +1,11 @@
 <?php
 
+/*
+ * PHP Search Engine Project
+ *
+ * @copyright 2020 Joshua Crocker
+ */
+
 use Crockerio\SearchEngine\Utils\FileUtils;
 
 require_once 'vendor/autoload.php';
