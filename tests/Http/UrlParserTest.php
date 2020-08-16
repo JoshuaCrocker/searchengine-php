@@ -49,7 +49,7 @@ class UrlParserTest extends TestCase
     {
         // All URLs have the referrer "https://example.com/subdir/file.php"
         return [
-// Full URL
+            // Full URL
             ['https://example.com', 'https://example.com'],
             ['http://example.com', 'http://example.com'],
             ['HTTPS://EXAMPLE.COM', 'HTTPS://EXAMPLE.COM'],

@@ -15,7 +15,7 @@ define('DATA_DIR', __DIR__.'/data');
 
 function write_to_console($text)
 {
-    print "[*] $text\n";
+    echo "[*] $text\n";
 }
 
 // Check if the data directory exists
