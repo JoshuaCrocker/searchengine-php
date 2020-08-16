@@ -1,4 +1,5 @@
 <?php
+
 /*
  * PHP Search Engine Project
  *
@@ -17,7 +18,7 @@ $pass = 'root';
 $database = \Crockerio\SearchEngine\Database\Database::getInstance('db', $host, $user, $pass, $db);
 $domainDao = new \Crockerio\SearchEngine\Database\DAO\DomainDAO();
 
-define('DATA_DIR', __DIR__ . '/data');
+define('DATA_DIR', __DIR__.'/data');
 
 function write_to_console($text)
 {
