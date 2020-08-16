@@ -8,51 +8,69 @@
 
 namespace Crockerio\SearchEngine\Http;
 
+use Crockerio\SearchEngine\Utils\UrlUtils;
+
 class UrlParser
 {
     public const TYPE_FULL = 1;
-
+    
     public const TYPE_RELATIVE = 2;
-
+    
     public const TYPE_DOMAIN_RELATIVE = 3;
-
+    
+    public const TYPE_SCHEMELESS = 4;
+    
     public const TYPE_INVALID = -1;
-
+    
     private $url;
-
+    
     private $referer;
-
+    
     private $type = self::TYPE_INVALID;
-
+    
     public function __construct($url, $referer = null)
     {
         $this->url = trim($url);
         $this->referer = trim($referer);
         $this->parseUrl();
     }
-
+    
     public function getType()
     {
         return $this->type;
     }
-
+    
     public function getFullUrl()
     {
         if ($this->type == self::TYPE_FULL) {
             return $this->url;
         }
+        
         if ($this->type == self::TYPE_RELATIVE) {
             $baseUrl = $this->getBaseUrlAndPathFromReferer();
-
+            
             return $baseUrl . $this->url;
         }
+        
         if ($this->type == self::TYPE_DOMAIN_RELATIVE) {
             $baseUrl = $this->getBaseUrlFromReferer();
-
+            
             return $baseUrl . $this->url;
         }
+        
+        if ($this->type == self::TYPE_SCHEMELESS) {
+            $scheme = $this->getSchemeFromReferer();
+            
+            return $scheme . ':' . $this->url;
+        }
     }
-
+    
+    private function getSchemeFromReferer()
+    {
+        $parts = parse_url($this->referer);
+        return $parts['scheme'];
+    }
+    
     private function getBaseUrlAndPathFromReferer()
     {
         $parts = parse_url($this->referer);
@@ -63,10 +81,10 @@ class UrlParser
             array_pop($path);
             $path = join('/', $path);
         }
-
+        
         return $baseUrl . $path . '/';
     }
-
+    
     private function getBaseUrlFromReferer()
     {
         $parts = parse_url($this->referer);
@@ -82,51 +100,44 @@ class UrlParser
         if (isset($parts['port'])) {
             $baseUrl .= ':' . $parts['port'];
         }
-
+        
         return $baseUrl;
     }
-
+    
     private function parseUrl()
     {
-        // Check if we have a full URL
+        if ($this->url === '') {
+            return;
+        }
+        
         if ($this->beginsWithValidScheme()) {
-            if ($this->isValidUrl()) {
+            if (UrlUtils::isValidUrl($this->url)) {
                 $this->type = self::TYPE_FULL;
             }
-
-            return;
-        }
-        if (! $this->isValidUrl() && $this->url !== '' && substr($this->url, 0, 1) !== '/') {
+        } elseif (!UrlUtils::isValidUrl($this->url) && substr($this->url, 0, 2) === '//') {
+            if (UrlUtils::isValidUrl('https:' . $this->url)) {
+                $this->type = self::TYPE_SCHEMELESS;
+            }
+        } elseif (!UrlUtils::isValidUrl($this->url) && substr($this->url, 0, 1) !== '/') {
             // Check if we have a relative URL
+            
             $this->type = self::TYPE_RELATIVE;
-
-            return;
-        }
-        if (! $this->isValidUrl() && $this->url !== '' && substr($this->url, 0, 1) === '/') {
+        } elseif (!UrlUtils::isValidUrl($this->url) && substr($this->url, 0, 1) === '/') {
             // Check if we have a relative URL
             $this->type = self::TYPE_DOMAIN_RELATIVE;
-
-            return;
         }
     }
-
+    
     private function beginsWithValidScheme()
     {
         // The scheme must be HTTP or HTTPS
         $parts = parse_url($this->url);
-        if (! isset($parts['scheme'])) {
+        if (!isset($parts['scheme'])) {
             return false;
         }
         $scheme = strtolower($parts['scheme']);
-
+        
         return $scheme == 'http' || $scheme == 'https';
     }
-
-    /**
-     * @return mixed
-     */
-    private function isValidUrl()
-    {
-        return filter_var($this->url, FILTER_VALIDATE_URL);
-    }
+    
 }

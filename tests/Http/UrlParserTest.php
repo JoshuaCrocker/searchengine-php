@@ -31,6 +31,7 @@ class UrlParserTest extends TestCase
             ['https://example.com#fragment', UrlParser::TYPE_FULL],
             ['https://example.com?query=string&second=parameter#fragment', UrlParser::TYPE_FULL],
             ['https://example.com/path/to/file.php?query=string&second=parameter#fragment', UrlParser::TYPE_FULL],
+            
             // Relative URL
             ['file.php', UrlParser::TYPE_RELATIVE],
             ['folder', UrlParser::TYPE_RELATIVE],
@@ -39,6 +40,7 @@ class UrlParserTest extends TestCase
             ['file.php#fragment', UrlParser::TYPE_RELATIVE],
             ['file.php?query=string&second=parameter#fragment', UrlParser::TYPE_RELATIVE],
             ['file.php?query=string&second=parameter#fragment', UrlParser::TYPE_RELATIVE],
+            
             // Domain-Level Relative URL
             ['/', UrlParser::TYPE_DOMAIN_RELATIVE],
             ['/file.php', UrlParser::TYPE_DOMAIN_RELATIVE],
@@ -48,9 +50,22 @@ class UrlParserTest extends TestCase
             ['/file.php#fragment', UrlParser::TYPE_DOMAIN_RELATIVE],
             ['/file.php?query=string&second=parameter#fragment', UrlParser::TYPE_DOMAIN_RELATIVE],
             ['/file.php?query=string&second=parameter#fragment', UrlParser::TYPE_DOMAIN_RELATIVE],
+            
+            // Scheme-less URL
+            ['//example.com', UrlParser::TYPE_SCHEMELESS],
+            ['//EXAMPLE.COM', UrlParser::TYPE_SCHEMELESS],
+            ['//user@example.com', UrlParser::TYPE_SCHEMELESS],
+            ['//user:password@example.com', UrlParser::TYPE_SCHEMELESS],
+            ['//example.com:1234', UrlParser::TYPE_SCHEMELESS],
+            ['//example.com/path/to/file.php', UrlParser::TYPE_SCHEMELESS],
+            ['//example.com?query=string&second=parameter', UrlParser::TYPE_SCHEMELESS],
+            ['//example.com/path/to/file.php?query=string&second=parameter', UrlParser::TYPE_SCHEMELESS],
+            ['//example.com#fragment', UrlParser::TYPE_SCHEMELESS],
+            ['//example.com?query=string&second=parameter#fragment', UrlParser::TYPE_SCHEMELESS],
+            ['//example.com/path/to/file.php?query=string&second=parameter#fragment', UrlParser::TYPE_SCHEMELESS],
         ];
     }
-
+    
     public function urlTransformProvider()
     {
         // All URLs have the referrer "https://example.com/subdir/file.php"
@@ -77,20 +92,45 @@ class UrlParserTest extends TestCase
                 'https://example.com/path/to/file.php?query=string&second=parameter#fragment',
                 'https://example.com/path/to/file.php?query=string&second=parameter#fragment',
             ],
+            
             // Relative URL
             ['other.php', 'https://example.com/subdir/other.php'],
             ['otherdir/other.php', 'https://example.com/subdir/otherdir/other.php'],
             ['other.php?query=string', 'https://example.com/subdir/other.php?query=string'],
             ['other.php#fragment', 'https://example.com/subdir/other.php#fragment'],
+            
             // Domain-Level Relative URL
             ['/', 'https://example.com/'],
             ['/other.php', 'https://example.com/other.php'],
             ['/otherdir/other.php', 'https://example.com/otherdir/other.php'],
             ['/other.php?query=string', 'https://example.com/other.php?query=string'],
             ['/other.php#fragment', 'https://example.com/other.php#fragment'],
+            
+            // Scheme-less URL
+            ['//example.com', 'https://example.com'],
+            ['//example.com', 'https://example.com'],
+            ['//EXAMPLE.COM', 'https://EXAMPLE.COM'],
+            ['//user@example.com', 'https://user@example.com'],
+            ['//user:password@example.com', 'https://user:password@example.com'],
+            ['//example.com:1234', 'https://example.com:1234'],
+            ['//example.com/path/to/file.php', 'https://example.com/path/to/file.php'],
+            ['//example.com?query=string&second=parameter', 'https://example.com?query=string&second=parameter'],
+            [
+                '//example.com/path/to/file.php?query=string&second=parameter',
+                'https://example.com/path/to/file.php?query=string&second=parameter'
+            ],
+            ['//example.com#fragment', 'https://example.com#fragment'],
+            [
+                '//example.com?query=string&second=parameter#fragment',
+                'https://example.com?query=string&second=parameter#fragment'
+            ],
+            [
+                '//example.com/path/to/file.php?query=string&second=parameter#fragment',
+                'https://example.com/path/to/file.php?query=string&second=parameter#fragment'
+            ],
         ];
     }
-
+    
     /**
      * The UrlParser class is capable of determining the type of the given URL.
      *
@@ -115,7 +155,7 @@ class UrlParserTest extends TestCase
         $parser = new UrlParser($url);
         $this->assertEquals($expectedType, $parser->getType());
     }
-
+    
     /**
      * The UrlParser class is capable of transforming relative URLs into full URls, given the referring URL.
      *
@@ -132,7 +172,7 @@ class UrlParserTest extends TestCase
         $parser = new UrlParser($url, 'https://example.com/subdir/file.php');
         $this->assertEquals($expectedUrl, $parser->getFullUrl());
     }
-
+    
     /** @test */
     public function it_can_rebuild_a_full_url_from_a_complex_referer()
     {

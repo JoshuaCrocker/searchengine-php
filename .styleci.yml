@@ -1,6 +1,6 @@
 risky: false
 version: 7
-preset: psr12
+preset: psr2
 tab-width: 4
 use-tabs: false
 finder:
