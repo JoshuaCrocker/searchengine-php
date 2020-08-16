@@ -139,5 +139,4 @@ class UrlParser
         
         return $scheme == 'http' || $scheme == 'https';
     }
-    
 }
