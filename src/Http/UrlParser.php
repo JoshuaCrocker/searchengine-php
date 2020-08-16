@@ -57,9 +57,12 @@ class UrlParser
     {
         $parts = parse_url($this->referer);
         $baseUrl = $this->getBaseUrlFromReferer();
-        $path = explode('/', $parts['path']);
-        array_pop($path);
-        $path = join('/', $path);
+        $path = '';
+        if (isset($parts['path'])) {
+            $path = explode('/', $parts['path']);
+            array_pop($path);
+            $path = join('/', $path);
+        }
 
         return $baseUrl . $path . '/';
     }
