@@ -1,5 +1,4 @@
 <?php
-
 /*
  * PHP Search Engine Project
  *
@@ -8,7 +7,7 @@
 
 namespace Crockerio\SearchEngine\Crawler;
 
-use Crockerio\SearchEngine\Database\Database;
+use Crockerio\SearchEngine\Database\DAO\DomainDAO;
 use Crockerio\SearchEngine\Domain;
 use Crockerio\SearchEngine\Http\UrlParser;
 use Crockerio\SearchEngine\Utils\FileUtils;
@@ -16,42 +15,22 @@ use PHPHtmlParser\Dom;
 
 class Crawler
 {
-    private $db;
+    private $domainDao;
 
-    private $stmt_update_crawl_time;
-
-    private $stmt_insert_domain;
-
+    /**
+     * Crawler constructor.
+     */
     public function __construct()
     {
-        $this->db = Database::getInstance('db')->getConnection();
-        $this->stmt_update_crawl_time = $this->db->prepare('UPDATE raw_site_list SET last_crawl_time = CURRENT_TIMESTAMP() WHERE `domain`=?');
-        $this->stmt_insert_domain = $this->db->prepare('INSERT INTO raw_site_list VALUES(null, ?, null)');
-    }
-
-    public function getNextCrawlableDomain()
-    {
-        $stmt = $this->db->query('SELECT * FROM site_list WHERE last_crawl_time is NULL or last_crawl_time < CURRENT_TIMESTAMP()-86400 ORDER BY last_crawl_time ASC, id ASC LIMIT 0,1');
-        $result = $stmt->fetch();
-        if (! $result) {
-            return null;
-        }
-        $domain = new Domain($result);
-
-        return $domain;
+        $this->domainDao = new DomainDAO();
     }
 
     public function processDomain(Domain $domain)
     {
         \write_to_console("Indexing {$domain->getDomain()}\t{$domain->getDomainStorageKey()}\t{$domain->getDomainHash()}");
-        $this->markDomainAsCrawled($domain);
+        $this->domainDao->updateCrawlTime($domain->getDomain());
         $this->crawlDomain($domain);
         $this->extractDomainsFromArchive($domain);
-    }
-
-    private function markDomainAsCrawled(Domain $domain)
-    {
-        $this->stmt_update_crawl_time->execute([$domain->getDomain()]);
     }
 
     private function crawlDomain(Domain $domain)
@@ -82,11 +61,10 @@ class Crawler
         $dom->loadFromFile($path_to_archive);
         $links = $dom->find('a');
         foreach ($links as $link) {
-            // For now, just accept urls beginning with 'http'
             $href = $link->getAttribute('href');
             $parser = new UrlParser($href, $domain->getDomain());
-            if ($parser->getType() != UrlParser::TYPE_INVALID) {
-                $this->stmt_insert_domain->execute([$parser->getFullUrl()]);
+            if ($parser->getType() != UrlParser::TYPE_INVALID && ! $this->domainDao->domainExistsInIndex($parser->getFullUrl())) {
+                $this->domainDao->insertDomain($parser->getFullUrl());
             }
         }
     }
