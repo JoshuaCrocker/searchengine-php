@@ -3,7 +3,7 @@
 /*
  * PHP Search Engine Project
  *
- * @copyright 2020 Joshua Crocker
+ * Copyright (C) 2020 Joshua Crocker
  */
 
 namespace Crockerio\SearchEngine\Crawler;
@@ -68,8 +68,8 @@ class Crawler
      */
     private function getDomainArchivePath(Domain $domain): string
     {
-        $data_directory = DATA_DIR.'/'.$domain->getDomainStorageKey();
-        $path_to_archive = $data_directory.'/'.$domain->getDomainHash().'.html';
+        $data_directory = DATA_DIR . '/' . $domain->getDomainStorageKey();
+        $path_to_archive = $data_directory . '/' . $domain->getDomainHash() . '.html';
         FileUtils::createDirectoryIfNotExists($data_directory);
 
         return $path_to_archive;

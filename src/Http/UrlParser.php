@@ -3,7 +3,7 @@
 /*
  * PHP Search Engine Project
  *
- * @copyright 2020 Joshua Crocker
+ * Copyright (C) 2020 Joshua Crocker
  */
 
 namespace Crockerio\SearchEngine\Http;
@@ -44,12 +44,12 @@ class UrlParser
         if ($this->type == self::TYPE_RELATIVE) {
             $baseUrl = $this->getBaseUrlAndPathFromReferer();
 
-            return $baseUrl.$this->url;
+            return $baseUrl . $this->url;
         }
         if ($this->type == self::TYPE_DOMAIN_RELATIVE) {
             $baseUrl = $this->getBaseUrlFromReferer();
 
-            return $baseUrl.$this->url;
+            return $baseUrl . $this->url;
         }
     }
 
@@ -61,23 +61,23 @@ class UrlParser
         array_pop($path);
         $path = join('/', $path);
 
-        return $baseUrl.$path.'/';
+        return $baseUrl . $path . '/';
     }
 
     private function getBaseUrlFromReferer()
     {
         $parts = parse_url($this->referer);
-        $baseUrl = $parts['scheme'].'://';
+        $baseUrl = $parts['scheme'] . '://';
         if (isset($parts['user'])) {
             $baseUrl .= $parts['user'];
             if (isset($parts['pass'])) {
-                $baseUrl .= ':'.$parts['pass'];
+                $baseUrl .= ':' . $parts['pass'];
             }
             $baseUrl .= '@';
         }
         $baseUrl .= $parts['host'];
         if (isset($parts['port'])) {
-            $baseUrl .= ':'.$parts['port'];
+            $baseUrl .= ':' . $parts['port'];
         }
 
         return $baseUrl;

@@ -3,7 +3,7 @@
 /*
  * PHP Search Engine Project
  *
- * @copyright 2020 Joshua Crocker
+ * Copyright (C) 2020 Joshua Crocker
  */
 
 namespace Crockerio\SearchEngine\Exceptions;
@@ -17,6 +17,6 @@ class UrlParserException extends \Exception
 
     public function __toString()
     {
-        return __CLASS__.": [{$this->code}]: {$this->message}\n";
+        return __CLASS__ . ": [{$this->code}]: {$this->message}\n";
     }
 }

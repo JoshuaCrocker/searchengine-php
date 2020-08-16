@@ -3,7 +3,7 @@
 /*
  * PHP Search Engine Project
  *
- * @copyright 2020 Joshua Crocker
+ * Copyright (C) 2020 Joshua Crocker
  */
 
 use Crockerio\SearchEngine\Utils\FileUtils;
@@ -17,7 +17,7 @@ $pass = 'root';
 
 $database = \Crockerio\SearchEngine\Database\Database::getInstance('db', $host, $user, $pass, $db);
 
-define('DATA_DIR', __DIR__.'/data');
+define('DATA_DIR', __DIR__ . '/data');
 
 function write_to_console($text)
 {
