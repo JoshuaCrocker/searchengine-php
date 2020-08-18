@@ -3,13 +3,15 @@
 
 namespace Crockerio\SearchEngine\Index;
 
+use Crockerio\SearchEngine\Utils\IntegerUtil;
+
 class TutorialIndex implements IIndex
 {
     public const DOCUMENT_ENTRY_COUNT = 3;
     
     public function __construct()
     {
-        if (!defined('INDEX_PATH')) {
+        if (!defined('INDEX_DIR')) {
             echo 'INDEX_PATH must be defined';
             die();
         }
@@ -17,7 +19,7 @@ class TutorialIndex implements IIndex
     
     private function getIndexFileName($name)
     {
-        return INDEX_PATH . '/' . $name;
+        return INDEX_DIR . '/' . $name . '.bin';
     }
     
     /**
@@ -37,9 +39,9 @@ class TutorialIndex implements IIndex
         
         $fh = fopen($path, 'w');
         foreach ($documents as $document) {
-            $bindata1 = pack('i', intval($document[0]));
-            $bindata2 = pack('i', intval($document[1]));
-            $bindata3 = pack('i', intval($document[2]));
+            $bindata1 = IntegerUtil::int8(intval($document[0]));
+            $bindata2 = IntegerUtil::int8(intval($document[1]));
+            $bindata3 = IntegerUtil::int8(intval($document[2]));
             
             fwrite($fh, $bindata1);
             fwrite($fh, $bindata2);
@@ -60,24 +62,38 @@ class TutorialIndex implements IIndex
         }
         
         $fh = fopen($this->getIndexFileName($name), 'r');
+        if (!$fh) {
+            return [];
+        }
+        
         $filesize = filesize($this->getIndexFileName($name));
         
-        if ($filesize % PHP_INT_SIZE != 0) {
+        if ($filesize % 1 != 0) {
             throw new \Exception('Corrupt Index Document!');
         }
         
         $documents = [];
         
-        for ($i = 0; $i < $filesize / PHP_INT_SIZE; $i++) {
-            $bindata1 = fread($fh, PHP_INT_SIZE);
-            $bindata2 = fread($fh, PHP_INT_SIZE);
-            $bindata3 = fread($fh, PHP_INT_SIZE);
+        for ($i = 0; $i < $filesize / 3; $i++) {
+            $bindata1 = fread($fh, 1);
+            $bindata2 = fread($fh, 1);
+            $bindata3 = fread($fh, 1);
             
-            $data1 = unpack('i', $bindata1);
-            $data2 = unpack('i', $bindata2);
-            $data3 = unpack('i', $bindata3);
+            $data1 = IntegerUtil::int8($bindata1);
+            $data2 = IntegerUtil::int8($bindata2);
+            $data3 = IntegerUtil::int8($bindata3);
             
-            $documents[] = [$data1[1], $data2[1], $data3[1]];
+            if ($data1 === false || $data2 === false || $data3 === false) {
+                print '------- ' . $name . ' -------' . "\n";
+                
+                var_dump($data1);
+                var_dump($data2);
+                var_dump($data3);
+                
+                print '------- END -------' . "\n";
+            }
+            
+            $documents[] = [$data1, $data2, $data3];
         }
         fclose($fh);
         
@@ -89,11 +105,11 @@ class TutorialIndex implements IIndex
      */
     public function clearIndex()
     {
-        $fp = opendir(INDEXLOCATION);
+        $fp = opendir(INDEX_DIR);
         
         while (false !== ($file = readdir($fp))) {
-            if (is_file(INDEX_PATH . '/' . $file)) {
-                unlink(INDEX_PATH . '/' . $file);
+            if (is_file(INDEX_DIR . '/' . $file)) {
+                unlink(INDEX_DIR . '/' . $file);
             }
         }
     }

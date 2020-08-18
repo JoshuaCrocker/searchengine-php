@@ -8,7 +8,7 @@ class TutorialDocumentStore implements IDocumentStore
 {
     public function __construct()
     {
-        if (!defined('DOCUMENT_STORE_PATH')) {
+        if (!defined('DOCUMENT_STORE_DIR')) {
             echo 'DOCUMENT_STORE_PATH must be defined';
             die();
         }
@@ -16,14 +16,14 @@ class TutorialDocumentStore implements IDocumentStore
     
     private function getPath($id)
     {
-        return DOCUMENT_STORE_PATH . '/' . $id;
+        return DOCUMENT_STORE_DIR . '/' . $id;
     }
     
     private function getNextId()
     {
         $filecount = 0;
         
-        $files = glob(DOCUMENT_STORE_PATH . "/*");
+        $files = glob(DOCUMENT_STORE_DIR . "/*");
         if ($files) {
             $filecount = count($files);
         }
@@ -56,11 +56,11 @@ class TutorialDocumentStore implements IDocumentStore
     
     public function clearDocuments()
     {
-        $fp = opendir(DOCUMENT_STORE_PATH);
+        $fp = opendir(DOCUMENT_STORE_DIR);
         
         while (false !== ($file = readdir($fp))) {
-            if (is_file(DOCUMENT_STORE_PATH . '/' . $file)) {
-                unlink(DOCUMENT_STORE_PATH . '/' . $file);
+            if (is_file(DOCUMENT_STORE_DIR . '/' . $file)) {
+                unlink(DOCUMENT_STORE_DIR . '/' . $file);
             }
         }
     }

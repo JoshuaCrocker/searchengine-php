@@ -31,7 +31,7 @@ class Crawler
         \write_to_console("Indexing {$domain->getDomain()}\t{$domain->getDomainStorageKey()}\t{$domain->getDomainHash()}");
         $this->domainDao->updateCrawlTime($domain->getDomain());
         $this->crawlDomain($domain);
-        $this->extractDomainsFromArchive($domain);
+//        $this->extractDomainsFromArchive($domain);
     }
 
     private function crawlDomain(Domain $domain)
@@ -48,7 +48,7 @@ class Crawler
      */
     private function getDomainArchivePath(Domain $domain): string
     {
-        $data_directory = DATA_DIR . '/' . $domain->getDomainStorageKey();
+        $data_directory = CRAWLER_DIR . '/' . $domain->getDomainStorageKey();
         $path_to_archive = $data_directory . '/' . $domain->getDomainHash() . '.html';
         FileUtils::createDirectoryIfNotExists($data_directory);
 
