@@ -18,8 +18,6 @@ $pass = 'root';
 $database = \Crockerio\SearchEngine\Database\Database::getInstance('db', $host, $user, $pass, $db);
 $domainDao = new \Crockerio\SearchEngine\Database\DAO\DomainDAO();
 
-define('DATA_DIR', __DIR__ . '/data');
-
 function write_to_console($text)
 {
     echo "[*] $text\n";
@@ -27,6 +25,7 @@ function write_to_console($text)
 
 // Check if the data directory exists
 FileUtils::createDirectoryIfNotExists(DATA_DIR);
+FileUtils::createDirectoryIfNotExists(CRAWLER_DIR);
 
 // Begin crawling
 $crawler = new \Crockerio\SearchEngine\Crawler\Crawler();

@@ -11,13 +11,14 @@ namespace Crockerio\SearchEngine;
 class Domain
 {
     private $domain;
-
+    
     private $last_crawl_time;
-
+    private $last_index_time;
+    
     private $domain_hash;
-
+    
     private $domain_storage_key;
-
+    
     /**
      * Domain constructor.
      *
@@ -29,8 +30,9 @@ class Domain
         $this->setDomainHash($arr['domain_hash']);
         $this->setDomainStorageKey($arr['domain_storage_key']);
         $this->setLastCrawlTime($arr['last_crawl_time']);
+        $this->setLastIndexTime($arr['last_index_time']);
     }
-
+    
     /**
      * @return mixed
      */
@@ -38,7 +40,7 @@ class Domain
     {
         return $this->domain;
     }
-
+    
     /**
      * @param mixed $domain
      */
@@ -46,7 +48,7 @@ class Domain
     {
         $this->domain = $domain;
     }
-
+    
     /**
      * @return mixed
      */
@@ -54,7 +56,7 @@ class Domain
     {
         return $this->last_crawl_time;
     }
-
+    
     /**
      * @param mixed $last_crawl_time
      */
@@ -62,7 +64,23 @@ class Domain
     {
         $this->last_crawl_time = $last_crawl_time;
     }
-
+    
+    /**
+     * @return mixed
+     */
+    public function getLastIndexTime()
+    {
+        return $this->last_crawl_time;
+    }
+    
+    /**
+     * @param mixed $last_crawl_time
+     */
+    public function setLastIndexTime($last_crawl_time)
+    {
+        $this->last_crawl_time = $last_crawl_time;
+    }
+    
     /**
      * @return mixed
      */
@@ -70,7 +88,7 @@ class Domain
     {
         return $this->domain_hash;
     }
-
+    
     /**
      * @param mixed $domain_hash
      */
@@ -78,7 +96,7 @@ class Domain
     {
         $this->domain_hash = $domain_hash;
     }
-
+    
     /**
      * @return mixed
      */
@@ -86,7 +104,7 @@ class Domain
     {
         return $this->domain_storage_key;
     }
-
+    
     /**
      * @param mixed $domain_storage_key
      */
