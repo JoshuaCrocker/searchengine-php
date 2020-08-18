@@ -1,8 +1,12 @@
 <?php
 
+/*
+ * PHP Search Engine Project
+ *
+ * Copyright (C) 2020 Joshua Crocker
+ */
 
 namespace Crockerio\SearchEngine\Index;
-
 
 use Crockerio\SearchEngine\DocumentStore\IDocumentStore;
 
