@@ -90,8 +90,7 @@ class TutorialIndexer implements IIndexer
         foreach ($documents as $document) {
             $id = $this->store->storeDocument($document);
             
-            foreach ($document as $subdoc)
-            {
+            foreach ($document as $subdoc) {
                 $concordance = $this->getConcordance($this->cleanDocument($subdoc));
     
                 foreach ($concordance as $word => $count) {

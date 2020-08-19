@@ -1,12 +1,15 @@
 <?php
 
+/*
+ * PHP Search Engine Project
+ *
+ * Copyright (C) 2020 Joshua Crocker
+ */
 
 namespace Crockerio\SearchEngine\Ranker;
 
-
 class TutorialRanker implements IRanker
 {
-    
     public function rank($document1, $document2)
     {
         if (!is_array($document1) || !is_array($document2)) {
