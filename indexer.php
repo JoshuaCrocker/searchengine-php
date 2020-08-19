@@ -32,8 +32,8 @@ while (null != $next_website) {
     $data_directory = CRAWLER_DIR . '/' . $next_website->getDomainStorageKey();
     $path_to_archive = $data_directory . '/' . $next_website->getDomainHash() . '.html';
     $content = file_get_contents($path_to_archive);
-    $indexer->index([$content]);
-    $next_website = $domainDao->getNextIndexableDomain();
+    $indexer->index([unserialize($content)]);
     unset($content);
     $domainDao->updateIndexTime($next_website->getDomain());
+    $next_website = $domainDao->getNextIndexableDomain();
 }
