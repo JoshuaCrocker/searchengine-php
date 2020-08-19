@@ -69,8 +69,11 @@ class TutorialIndexer implements IIndexer
         // Remove punctuation from the document.
         $document = preg_replace('/\p{P}/', ' ', $document);
         
-        // Replace all spaces with one space
-        $document = preg_replace('/\s/', ' ', $document);
+        // Replace all multi-spaces with one space
+        $document = preg_replace('/\s\s+/', ' ', $document);
+        
+        // Remove non-word characters
+        $document = preg_replace('/\W/', ' ', $document);
         
         // Make the document lower case
         $document = strtolower($document);
@@ -85,18 +88,20 @@ class TutorialIndexer implements IIndexer
         }
         
         foreach ($documents as $document) {
-            $id = $this->store->storeDocument([$document]);
+            $id = $this->store->storeDocument($document);
             
-            $concordance = $this->getConcordance($this->cleanDocument($document));
-            
-            foreach ($concordance as $word => $count) {
-                $ind = $this->index->getDocuments($word);
-                
-                if (count($ind) == 0) {
-                    $this->index->storeDocuments($word, [[$id, $count, 0]]);
-                } else {
-                    $ind[] = [$id, 0, 0];
-                    $this->index->storeDocuments($word, $ind);
+            foreach ($document as $subdoc) {
+                $concordance = $this->getConcordance($this->cleanDocument($subdoc));
+    
+                foreach ($concordance as $word => $count) {
+                    $ind = $this->index->getDocuments($word);
+        
+                    if (count($ind) == 0) {
+                        $this->index->storeDocuments($word, [[$id, $count, 0]]);
+                    } else {
+                        $ind[] = [$id, $count, 0];
+                        $this->index->storeDocuments($word, $ind);
+                    }
                 }
             }
         }

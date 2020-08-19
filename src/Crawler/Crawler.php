@@ -17,7 +17,7 @@ use PHPHtmlParser\Dom;
 class Crawler
 {
     private $domainDao;
-
+    
     /**
      * Crawler constructor.
      */
@@ -25,7 +25,7 @@ class Crawler
     {
         $this->domainDao = new DomainDAO();
     }
-
+    
     public function processDomain(Domain $domain)
     {
         \write_to_console("Indexing {$domain->getDomain()}\t{$domain->getDomainStorageKey()}\t{$domain->getDomainHash()}");
@@ -33,15 +33,22 @@ class Crawler
         $this->crawlDomain($domain);
 //        $this->extractDomainsFromArchive($domain);
     }
-
+    
     private function crawlDomain(Domain $domain)
     {
         $path_to_archive = $this->getDomainArchivePath($domain);
         $web_page = file_get_contents($domain->getDomain());
-        file_put_contents($path_to_archive, $web_page);
+        $data = serialize([
+            $domain->getDomain(),
+            $web_page
+        ]);
+        $fh = fopen($path_to_archive, 'w');
+        fwrite($fh, $data);
+        fclose($fh);
+//        file_put_contents($path_to_archive, $data);
         unset($web_page);
     }
-
+    
     /**
      * @param \Crockerio\SearchEngine\Domain $domain
      * @return string
@@ -51,10 +58,10 @@ class Crawler
         $data_directory = CRAWLER_DIR . '/' . $domain->getDomainStorageKey();
         $path_to_archive = $data_directory . '/' . $domain->getDomainHash() . '.html';
         FileUtils::createDirectoryIfNotExists($data_directory);
-
+        
         return $path_to_archive;
     }
-
+    
     private function extractDomainsFromArchive(Domain $domain)
     {
         $path_to_archive = $this->getDomainArchivePath($domain);
@@ -64,7 +71,7 @@ class Crawler
         foreach ($links as $link) {
             $href = $link->getAttribute('href');
             $parser = new UrlParser($href, $domain->getDomain());
-            if ($parser->getType() != UrlParser::TYPE_INVALID && ! $this->domainDao->domainExistsInIndex($parser->getFullUrl())) {
+            if ($parser->getType() != UrlParser::TYPE_INVALID && !$this->domainDao->domainExistsInIndex($parser->getFullUrl())) {
                 $this->domainDao->insertDomain($parser->getFullUrl());
             }
         }
