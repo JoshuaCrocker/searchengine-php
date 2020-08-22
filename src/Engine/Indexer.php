@@ -13,6 +13,7 @@ use Crockerio\SearchEngine\Database\Models\Document;
 use Crockerio\SearchEngine\Database\Models\Domain;
 use Crockerio\SearchEngine\Database\Models\Index;
 use Crockerio\SearchEngine\Database\Models\Word;
+use Crockerio\SearchEngine\Logger\Logger;
 use Crockerio\SearchEngine\Utils\FileUtils;
 
 /**
@@ -158,7 +159,7 @@ class Indexer
      */
     private function _indexDomain(Domain $domain)
     {
-        crocker_log('Index ' . $domain->domain);
+        Logger::getLogger()->info('Index ' . $domain->domain);
         
         // Set the last indexed time
         $domain->last_index_time = Carbon::now();
