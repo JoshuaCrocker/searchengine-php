@@ -6,17 +6,10 @@
  * Copyright (C) 2020 Joshua Crocker
  */
 
+use Carbon\Carbon;
 use Crockerio\SearchEngine\Utils\FileUtils;
 
-require_once 'vendor/autoload.php';
-
-$host = '127.0.0.1:8889';
-$db = 'searchengine';
-$user = 'root';
-$pass = 'root';
-
-$database = \Crockerio\SearchEngine\Database\Database::getInstance('db', $host, $user, $pass, $db);
-$domainDao = new \Crockerio\SearchEngine\Database\DAO\DomainDAO();
+require_once __DIR__ . '/bootstrap.php';
 
 function write_to_console($text)
 {
@@ -29,9 +22,11 @@ FileUtils::createDirectoryIfNotExists(CRAWLER_DIR);
 
 // Begin crawling
 $crawler = new \Crockerio\SearchEngine\Crawler\Crawler();
-$next_website = $domainDao->getNextCrawlableDomain();
+$next_website = \Crockerio\SearchEngine\Database\Models\Domain::where('last_crawl_time',
+    null)->orWhere('last_crawl_time', '<', Carbon::now()->subDay())->first();
 
 while (null != $next_website) {
     $crawler->processDomain($next_website);
-    $next_website = $domainDao->getNextCrawlableDomain();
+    $next_website = \Crockerio\SearchEngine\Database\Models\Domain::where('last_crawl_time',
+        null)->orWhere('last_crawl_time', '<', Carbon::now()->subDay())->first();
 }

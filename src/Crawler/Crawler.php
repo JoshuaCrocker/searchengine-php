@@ -8,28 +8,28 @@
 
 namespace Crockerio\SearchEngine\Crawler;
 
-use Crockerio\SearchEngine\Database\DAO\DomainDAO;
-use Crockerio\SearchEngine\Domain;
+use Carbon\Carbon;
+use Crockerio\SearchEngine\Database\Models\Domain;
 use Crockerio\SearchEngine\Http\UrlParser;
 use Crockerio\SearchEngine\Utils\FileUtils;
 use PHPHtmlParser\Dom;
 
 class Crawler
 {
-    private $domainDao;
-    
     /**
      * Crawler constructor.
      */
     public function __construct()
     {
-        $this->domainDao = new DomainDAO();
+        //
     }
     
     public function processDomain(Domain $domain)
     {
-        \write_to_console("Indexing {$domain->getDomain()}\t{$domain->getDomainStorageKey()}\t{$domain->getDomainHash()}");
-        $this->domainDao->updateCrawlTime($domain->getDomain());
+        \write_to_console("Indexing {$domain->domain}\t{$domain->getDomainStorageKey()}\t{$domain->getDomainHash()}");
+        $domain->last_crawl_time = Carbon::now();
+        $domain->save();
+        
         $this->crawlDomain($domain);
 //        $this->extractDomainsFromArchive($domain);
     }
@@ -37,15 +37,14 @@ class Crawler
     private function crawlDomain(Domain $domain)
     {
         $path_to_archive = $this->getDomainArchivePath($domain);
-        $web_page = file_get_contents($domain->getDomain());
+        $web_page = file_get_contents($domain->domain);
         $data = serialize([
-            $domain->getDomain(),
+            $domain->domain,
             $web_page
         ]);
         $fh = fopen($path_to_archive, 'w');
         fwrite($fh, $data);
         fclose($fh);
-//        file_put_contents($path_to_archive, $data);
         unset($web_page);
     }
     
@@ -65,14 +64,21 @@ class Crawler
     private function extractDomainsFromArchive(Domain $domain)
     {
         $path_to_archive = $this->getDomainArchivePath($domain);
+        
         $dom = new Dom();
         $dom->loadFromFile($path_to_archive);
         $links = $dom->find('a');
+        
         foreach ($links as $link) {
             $href = $link->getAttribute('href');
-            $parser = new UrlParser($href, $domain->getDomain());
-            if ($parser->getType() != UrlParser::TYPE_INVALID && !$this->domainDao->domainExistsInIndex($parser->getFullUrl())) {
-                $this->domainDao->insertDomain($parser->getFullUrl());
+            $parser = new UrlParser($href, $domain->domain);
+            
+            $domainExists = Domain::where('domain', $parser->getFullUrl())->count() > 0;
+            
+            if ($parser->getType() != UrlParser::TYPE_INVALID && !$domainExists) {
+                $domain = new Domain();
+                $domain->domain = $parser->getFullUrl();
+                $domain->save();
             }
         }
     }

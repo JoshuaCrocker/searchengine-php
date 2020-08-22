@@ -26,7 +26,9 @@
     }
   },
   "require": {
-    "paquettg/php-html-parser": "^3.0"
+    "paquettg/php-html-parser": "^3.0",
+    "illuminate/database": "^7.25",
+    "illuminate/events": "^7.25"
   },
   "scripts": {
     "test": "./vendor/bin/phpunit"
