@@ -10,24 +10,65 @@ namespace Crockerio\SearchEngine\Http;
 
 use Crockerio\SearchEngine\Utils\UrlUtils;
 
+/**
+ * Class UrlParser
+ *
+ * @author Joshua Crocker
+ * @package Crockerio\SearchEngine\Http
+ */
 class UrlParser
 {
+    /**
+     * Full URL Flag.
+     */
     public const TYPE_FULL = 1;
     
+    /**
+     * Relative URL Flag.
+     */
     public const TYPE_RELATIVE = 2;
     
+    /**
+     * Domain Relative URL Flag.
+     */
     public const TYPE_DOMAIN_RELATIVE = 3;
     
+    /**
+     * Schemeless URL Flag.
+     */
     public const TYPE_SCHEMELESS = 4;
     
+    /**
+     * Invalid URL Flag.
+     */
     public const TYPE_INVALID = -1;
     
+    /**
+     * The URL.
+     *
+     * @var string
+     */
     private $url;
     
+    /**
+     * Referring URL.
+     *
+     * @var string
+     */
     private $referer;
     
+    /**
+     * URL Type.
+     *
+     * @var int
+     */
     private $type = self::TYPE_INVALID;
     
+    /**
+     * UrlParser constructor.
+     * @param string $url The URL
+     * @param null $referer The Referring URL
+     */
     public function __construct($url, $referer = null)
     {
         $this->url = trim($url);
@@ -35,11 +76,21 @@ class UrlParser
         $this->parseUrl();
     }
     
+    /**
+     * Get URL Type.
+     *
+     * @return int
+     */
     public function getType()
     {
         return $this->type;
     }
     
+    /**
+     * Determine the full URL.
+     *
+     * @return string The full URL.
+     */
     public function getFullUrl()
     {
         if ($this->type == self::TYPE_FULL) {
@@ -65,12 +116,22 @@ class UrlParser
         }
     }
     
+    /**
+     * Determine the Scheme from the Referring URL.
+     *
+     * @return string The Scheme.
+     */
     private function getSchemeFromReferer()
     {
         $parts = parse_url($this->referer);
         return $parts['scheme'];
     }
     
+    /**
+     * Determine the Base URL and Path from the Referring URL.
+     *
+     * @return string the Base URL and Path.
+     */
     private function getBaseUrlAndPathFromReferer()
     {
         $parts = parse_url($this->referer);
@@ -85,6 +146,11 @@ class UrlParser
         return $baseUrl . $path . '/';
     }
     
+    /**
+     * Determine the Base URL from the Referring URL.
+     *
+     * @return string the Base URL.
+     */
     private function getBaseUrlFromReferer()
     {
         $parts = parse_url($this->referer);
@@ -104,6 +170,9 @@ class UrlParser
         return $baseUrl;
     }
     
+    /**
+     * Parse the URL to determine the type.
+     */
     private function parseUrl()
     {
         if ($this->url === '') {
@@ -128,6 +197,11 @@ class UrlParser
         }
     }
     
+    /**
+     * Determine if the URL begins with a valid scheme.
+     *
+     * @return bool
+     */
     private function beginsWithValidScheme()
     {
         // The scheme must be HTTP or HTTPS

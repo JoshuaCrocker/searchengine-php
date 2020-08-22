@@ -114,7 +114,7 @@ class Crawler
         $next = $this->_getNextCrawlableWebsite();
         while (null != $next) {
             $this->_processDomain($next);
-//            $this->_extractDomains($next);
+            $this->_extractDomains($next);
             $next = $this->_getNextCrawlableWebsite();
         }
     }
