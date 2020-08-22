@@ -6,32 +6,8 @@
  * Copyright (C) 2020 Joshua Crocker
  */
 
-use Crockerio\SearchEngine\Utils\FileUtils;
-
-require_once 'vendor/autoload.php';
-
-$host = '127.0.0.1:8889';
-$db = 'searchengine';
-$user = 'root';
-$pass = 'root';
-
-$database = \Crockerio\SearchEngine\Database\Database::getInstance('db', $host, $user, $pass, $db);
-$domainDao = new \Crockerio\SearchEngine\Database\DAO\DomainDAO();
-
-function write_to_console($text)
-{
-    echo "[*] $text\n";
-}
-
-// Check if the data directory exists
-FileUtils::createDirectoryIfNotExists(DATA_DIR);
-FileUtils::createDirectoryIfNotExists(CRAWLER_DIR);
+require_once __DIR__ . '/bootstrap.php';
 
 // Begin crawling
 $crawler = new \Crockerio\SearchEngine\Crawler\Crawler();
-$next_website = $domainDao->getNextCrawlableDomain();
-
-while (null != $next_website) {
-    $crawler->processDomain($next_website);
-    $next_website = $domainDao->getNextCrawlableDomain();
-}
+$crawler->startCrawling();

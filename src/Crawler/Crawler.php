@@ -8,72 +8,121 @@
 
 namespace Crockerio\SearchEngine\Crawler;
 
-use Crockerio\SearchEngine\Database\DAO\DomainDAO;
-use Crockerio\SearchEngine\Domain;
+use Carbon\Carbon;
+use Crockerio\SearchEngine\Database\Models\Domain;
 use Crockerio\SearchEngine\Http\UrlParser;
 use Crockerio\SearchEngine\Utils\FileUtils;
 use PHPHtmlParser\Dom;
 
+/**
+ * Search Engine Crawler Class.
+ *
+ * @author Joshua Crocker
+ * @package Crockerio\SearchEngine\Crawler
+ */
 class Crawler
 {
-    private $domainDao;
-    
     /**
      * Crawler constructor.
      */
     public function __construct()
     {
-        $this->domainDao = new DomainDAO();
-    }
-    
-    public function processDomain(Domain $domain)
-    {
-        \write_to_console("Indexing {$domain->getDomain()}\t{$domain->getDomainStorageKey()}\t{$domain->getDomainHash()}");
-        $this->domainDao->updateCrawlTime($domain->getDomain());
-        $this->crawlDomain($domain);
-//        $this->extractDomainsFromArchive($domain);
-    }
-    
-    private function crawlDomain(Domain $domain)
-    {
-        $path_to_archive = $this->getDomainArchivePath($domain);
-        $web_page = file_get_contents($domain->getDomain());
-        $data = serialize([
-            $domain->getDomain(),
-            $web_page
-        ]);
-        $fh = fopen($path_to_archive, 'w');
-        fwrite($fh, $data);
-        fclose($fh);
-//        file_put_contents($path_to_archive, $data);
-        unset($web_page);
+        //
     }
     
     /**
-     * @param \Crockerio\SearchEngine\Domain $domain
-     * @return string
+     * Retrieve the next website from the database, or null if there are no more domains.
+     *
+     * @return Domain|null
      */
-    private function getDomainArchivePath(Domain $domain): string
+    private function _getNextCrawlableWebsite()
     {
-        $data_directory = CRAWLER_DIR . '/' . $domain->getDomainStorageKey();
-        $path_to_archive = $data_directory . '/' . $domain->getDomainHash() . '.html';
-        FileUtils::createDirectoryIfNotExists($data_directory);
+        $next = \Crockerio\SearchEngine\Database\Models\Domain::where(
+            'last_crawl_time',
+            null
+        )->orWhere('last_crawl_time', '<', Carbon::now()->subDay());
         
-        return $path_to_archive;
+        if ($next->count() == 0) {
+            return null;
+        }
+        
+        return $next->first();
     }
     
-    private function extractDomainsFromArchive(Domain $domain)
+    /**
+     * Process the website.
+     * Set the last crawled time to now and save the webpage.
+     *
+     * @param Domain $domain Domain Model
+     */
+    private function _processDomain(Domain $domain)
     {
-        $path_to_archive = $this->getDomainArchivePath($domain);
+        crocker_log('Processing ' . $domain->domain);
+        
+        // Mark the domain as crawled
+        // This has to be done first to stop other crawlers picking up this website
+        $domain->last_crawl_time = Carbon::now();
+        $domain->save();
+        
+        // Access the website
+        $contents = @file_get_contents($domain->domain);
+        
+        if (!$contents) {
+            crocker_log('Error accessing ' . $domain->domain);
+            return;
+        }
+        
+        $path = FileUtils::getArchivePath($domain);
+        
+        $fh = fopen($path, 'w');
+        fwrite($fh, $contents);
+        fclose($fh);
+        
+        unset($contents);
+    }
+    
+    /**
+     * Extract new domains from the crawled website.
+     *
+     * @param Domain $domain Domain Model
+     */
+    private function _extractDomains(Domain $domain)
+    {
+        $path = FileUtils::getArchivePath($domain);
+        
+        if (!file_exists($path)) {
+            crocker_log('Error accessing ' . $path);
+            return;
+        }
+        
         $dom = new Dom();
-        $dom->loadFromFile($path_to_archive);
+        $dom->loadFromFile($path);
         $links = $dom->find('a');
+        
         foreach ($links as $link) {
             $href = $link->getAttribute('href');
-            $parser = new UrlParser($href, $domain->getDomain());
-            if ($parser->getType() != UrlParser::TYPE_INVALID && !$this->domainDao->domainExistsInIndex($parser->getFullUrl())) {
-                $this->domainDao->insertDomain($parser->getFullUrl());
+            $parser = new UrlParser($href, $domain->domain);
+            
+            $domainExists = Domain::where('domain', $parser->getFullUrl())->count() > 0;
+            
+            if ($parser->getType() != UrlParser::TYPE_INVALID && !$domainExists) {
+                $domain = new Domain();
+                $domain->domain = $parser->getFullUrl();
+                $domain->save();
             }
+        }
+    }
+    
+    /**
+     * Begin crawling websites until there are no more websites available to crawl.
+     */
+    public function startCrawling()
+    {
+        $next = $this->_getNextCrawlableWebsite();
+        while (null != $next) {
+            $this->_processDomain($next);
+            $this->_extractDomains($next);
+            $next = $this->_getNextCrawlableWebsite();
         }
     }
 }

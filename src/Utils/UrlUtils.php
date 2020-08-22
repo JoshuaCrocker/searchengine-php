@@ -8,13 +8,19 @@
 
 namespace Crockerio\SearchEngine\Utils;
 
-use Crockerio\SearchEngine\Http\UrlParser;
-
+/**
+ * Class UrlUtils
+ *
+ * @author Joshua Crocker
+ * @package Crockerio\SearchEngine\Utils
+ */
 class UrlUtils
 {
     /**
-     * @param string $url
-     * @return mixed
+     * Determine if the URL is valid.
+     *
+     * @param string $url The URL.
+     * @return bool
      */
     public static function isValidUrl($url)
     {
