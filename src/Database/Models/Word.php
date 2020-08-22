@@ -11,4 +11,9 @@ class Word extends \Illuminate\Database\Eloquent\Model
     use IndexGuid;
     
     protected $fillable = ['word'];
+    
+    public function indices()
+    {
+        return $this->hasMany(Index::class);
+    }
 }
