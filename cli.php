@@ -1,5 +1,11 @@
 <?php
 
+/*
+ * PHP Search Engine Project
+ *
+ * Copyright (C) 2020 Joshua Crocker
+ */
+
 require_once __DIR__ . '/bootstrap.php';
 
 use Crockerio\SearchEngine\Command\CrawlCommand;

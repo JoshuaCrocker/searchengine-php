@@ -1,8 +1,12 @@
 <?php
 
+/*
+ * PHP Search Engine Project
+ *
+ * Copyright (C) 2020 Joshua Crocker
+ */
 
 namespace Crockerio\SearchEngine\Command;
-
 
 use Crockerio\SearchEngine\Database\Models\Domain;
 use Symfony\Component\Console\Command\Command;
