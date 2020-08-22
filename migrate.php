@@ -1,5 +1,11 @@
 <?php
 
+/*
+ * PHP Search Engine Project
+ *
+ * Copyright (C) 2020 Joshua Crocker
+ */
+
 require_once __DIR__ . '/bootstrap.php';
 
 use Illuminate\Database\Capsule\Manager as Capsule;
@@ -77,6 +83,3 @@ Capsule::schema()->table('indexes', function ($table) {
     $table->foreign('word_id')->references('id')->on('words');
     $table->foreign('document_id')->references('id')->on('documents');
 });
-
-
-

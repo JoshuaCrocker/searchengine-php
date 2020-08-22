@@ -1,5 +1,11 @@
 <?php
 
+/*
+ * PHP Search Engine Project
+ *
+ * Copyright (C) 2020 Joshua Crocker
+ */
+
 require "vendor/autoload.php";
 
 use Illuminate\Container\Container;

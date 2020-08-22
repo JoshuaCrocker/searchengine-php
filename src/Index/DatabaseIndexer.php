@@ -1,8 +1,12 @@
 <?php
 
+/*
+ * PHP Search Engine Project
+ *
+ * Copyright (C) 2020 Joshua Crocker
+ */
 
 namespace Crockerio\SearchEngine\Index;
-
 
 use Crockerio\SearchEngine\Database\Models\Index;
 use Crockerio\SearchEngine\DocumentStore\IDocumentStore;
@@ -33,22 +37,17 @@ class DatabaseIndexer implements IIndexer
             return false;
         }
         
-        foreach ($documents as $document)
-        {
+        foreach ($documents as $document) {
             $documentId = $this->store->storeDocument($document);
             
-            foreach ($document as $subdoc)
-            {
+            foreach ($document as $subdoc) {
                 $concordance = $this->getConcordance($this->cleanDocument($subdoc));
                 
-                foreach ($concordance as $word => $count)
-                {
+                foreach ($concordance as $word => $count) {
                     $index = $this->index->getDocuments($word);
                     
-                    if (count($index) == 0)
-                    {
+                    if (count($index) == 0) {
                         $ind = new Index();
-                        
                     }
                 }
             }

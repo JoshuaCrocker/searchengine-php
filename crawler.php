@@ -22,11 +22,15 @@ FileUtils::createDirectoryIfNotExists(CRAWLER_DIR);
 
 // Begin crawling
 $crawler = new \Crockerio\SearchEngine\Crawler\Crawler();
-$next_website = \Crockerio\SearchEngine\Database\Models\Domain::where('last_crawl_time',
-    null)->orWhere('last_crawl_time', '<', Carbon::now()->subDay())->first();
+$next_website = \Crockerio\SearchEngine\Database\Models\Domain::where(
+    'last_crawl_time',
+    null
+)->orWhere('last_crawl_time', '<', Carbon::now()->subDay())->first();
 
 while (null != $next_website) {
     $crawler->processDomain($next_website);
-    $next_website = \Crockerio\SearchEngine\Database\Models\Domain::where('last_crawl_time',
-        null)->orWhere('last_crawl_time', '<', Carbon::now()->subDay())->first();
+    $next_website = \Crockerio\SearchEngine\Database\Models\Domain::where(
+        'last_crawl_time',
+        null
+    )->orWhere('last_crawl_time', '<', Carbon::now()->subDay())->first();
 }
