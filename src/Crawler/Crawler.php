@@ -11,6 +11,7 @@ namespace Crockerio\SearchEngine\Crawler;
 use Carbon\Carbon;
 use Crockerio\SearchEngine\Database\Models\Domain;
 use Crockerio\SearchEngine\Http\UrlParser;
+use Crockerio\SearchEngine\Logger\Logger;
 use Crockerio\SearchEngine\Utils\FileUtils;
 use PHPHtmlParser\Dom;
 
@@ -57,7 +58,7 @@ class Crawler
      */
     private function _processDomain(Domain $domain)
     {
-        crocker_log('Processing ' . $domain->domain);
+        Logger::getLogger()->info('Processing ' . $domain->domain);
         
         // Mark the domain as crawled
         // This has to be done first to stop other crawlers picking up this website
@@ -68,7 +69,7 @@ class Crawler
         $contents = @file_get_contents($domain->domain);
         
         if (!$contents) {
-            crocker_log('Error accessing ' . $domain->domain);
+            Logger::getLogger()->notice('Error accessing ' . $domain->domain);
             return;
         }
         
@@ -91,7 +92,7 @@ class Crawler
         $path = FileUtils::getArchivePath($domain);
         
         if (!file_exists($path)) {
-            crocker_log('Error accessing ' . $path);
+            Logger::getLogger()->notice('Error accessing ' . $path);
             return;
         }
         

@@ -13,9 +13,6 @@
     }
   ],
   "autoload": {
-    "files": [
-      "constants.php"
-    ],
     "psr-4": {
       "Crockerio\\SearchEngine\\": "src/"
     }
@@ -29,7 +26,8 @@
     "paquettg/php-html-parser": "^3.0",
     "illuminate/database": "^7.25",
     "illuminate/events": "^7.25",
-    "symfony/console": "^5.1"
+    "symfony/console": "^5.1",
+    "monolog/monolog": "^2.1"
   },
   "scripts": {
     "test": "./vendor/bin/phpunit"
