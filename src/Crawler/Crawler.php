@@ -1,5 +1,10 @@
 <?php
 
+/*
+ * PHP Search Engine Project
+ *
+ * Copyright (C) 2020 Joshua Crocker
+ */
 
 namespace Crockerio\SearchEngine\Crawler;
 
@@ -32,8 +37,10 @@ class Crawler
      */
     private function _getNextCrawlableWebsite()
     {
-        $next = \Crockerio\SearchEngine\Database\Models\Domain::where('last_crawl_time',
-            null)->orWhere('last_crawl_time', '<', Carbon::now()->subDay());
+        $next = \Crockerio\SearchEngine\Database\Models\Domain::where(
+            'last_crawl_time',
+            null
+        )->orWhere('last_crawl_time', '<', Carbon::now()->subDay());
         
         if ($next->count() == 0) {
             return null;

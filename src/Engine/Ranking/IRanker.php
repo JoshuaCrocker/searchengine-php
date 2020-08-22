@@ -1,8 +1,12 @@
 <?php
 
+/*
+ * PHP Search Engine Project
+ *
+ * Copyright (C) 2020 Joshua Crocker
+ */
 
 namespace Crockerio\SearchEngine\Engine\Ranking;
-
 
 use Crockerio\SearchEngine\Database\Models\Index;
 use Illuminate\Support\Collection;

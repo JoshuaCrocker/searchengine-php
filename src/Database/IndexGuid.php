@@ -1,5 +1,10 @@
 <?php
 
+/*
+ * PHP Search Engine Project
+ *
+ * Copyright (C) 2020 Joshua Crocker
+ */
 
 namespace Crockerio\SearchEngine\Database;
 
@@ -20,9 +25,11 @@ trait IndexGuid
      */
     private static function genUuid()
     {
-        return sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
+        return sprintf(
+            '%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
             // 32 bits for "time_low"
-            mt_rand(0, 0xffff), mt_rand(0, 0xffff),
+            mt_rand(0, 0xffff),
+            mt_rand(0, 0xffff),
             
             // 16 bits for "time_mid"
             mt_rand(0, 0xffff),
@@ -37,7 +44,9 @@ trait IndexGuid
             mt_rand(0, 0x3fff) | 0x8000,
             
             // 48 bits for "node"
-            mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
+            mt_rand(0, 0xffff),
+            mt_rand(0, 0xffff),
+            mt_rand(0, 0xffff)
         );
     }
     

@@ -1,8 +1,12 @@
 <?php
 
+/*
+ * PHP Search Engine Project
+ *
+ * Copyright (C) 2020 Joshua Crocker
+ */
 
 namespace Crockerio\SearchEngine\Engine;
-
 
 use Crockerio\SearchEngine\Database\Models\Word;
 use Crockerio\SearchEngine\Engine\Ranking\OccurrencesRanker;
