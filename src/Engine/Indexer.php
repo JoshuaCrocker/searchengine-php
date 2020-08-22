@@ -10,6 +10,12 @@ use Crockerio\SearchEngine\Database\Models\Index;
 use Crockerio\SearchEngine\Database\Models\Word;
 use Crockerio\SearchEngine\Utils\FileUtils;
 
+/**
+ * Class Indexer
+ *
+ * @author Joshua Crocker
+ * @package Crockerio\SearchEngine\Engine
+ */
 class Indexer
 {
     /**

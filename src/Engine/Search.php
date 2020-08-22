@@ -5,9 +5,37 @@ namespace Crockerio\SearchEngine\Engine;
 
 
 use Crockerio\SearchEngine\Database\Models\Word;
+use Crockerio\SearchEngine\Engine\Ranking\OccurrencesRanker;
 
+/**
+ * Class Search
+ *
+ * @author Joshua Crocker
+ * @package Crockerio\SearchEngine\Engine
+ */
 class Search
 {
+    /**
+     * Ranker Instance.
+     *
+     * @var OccurrencesRanker
+     */
+    private $ranker;
+    
+    /**
+     * Search constructor.
+     */
+    public function __construct()
+    {
+        $this->ranker = new OccurrencesRanker();
+    }
+    
+    /**
+     * Split the search terms into an array of terms.
+     *
+     * @param $terms string Search terms.
+     * @return array Array of Search terms.
+     */
     private function _extractTerms($terms)
     {
         $terms = strtolower($terms);
@@ -17,6 +45,12 @@ class Search
         return explode(' ', $terms);
     }
     
+    /**
+     * Search the index.
+     *
+     * @param $terms string Search terms.
+     * @return array Search results.
+     */
     public function search($terms)
     {
         $allIndices = [];
@@ -33,7 +67,7 @@ class Search
             $indices = $word->first()->indices;
             
             if ($indices->count() > 0) {
-//                usort($index, [$this->ranker, 'rank']);
+                $this->ranker->rank($indices);
                 
                 foreach ($indices as $ind) {
                     $allIndices[] = $ind;
