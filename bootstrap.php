@@ -2,6 +2,7 @@
 
 require "vendor/autoload.php";
 
+use Crockerio\SearchEngine\Utils\FileUtils;
 use Illuminate\Container\Container;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Events\Dispatcher;
@@ -23,3 +24,9 @@ $capsule->setEventDispatcher(new Dispatcher(new Container));
 
 $capsule->setAsGlobal();
 $capsule->bootEloquent();
+
+// Setup file storage
+FileUtils::setStorageRoot(__DIR__);
+
+FileUtils::createDirectoryIfNotExists(FileUtils::getDataDirectoryPath());
+FileUtils::createDirectoryIfNotExists(FileUtils::getCrawlerDirectoryPath());

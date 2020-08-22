@@ -22,16 +22,7 @@ class Crawler
      */
     public function __construct()
     {
-        if (!defined('DATA_DIR')) {
-            \crocker_err('DATA_DIR is not defined');
-        }
-        
-        if (!defined('CRAWLER_DIR')) {
-            \crocker_err('CRAWLER_DIR is not defined');
-        }
-        
-        FileUtils::createDirectoryIfNotExists(DATA_DIR);
-        FileUtils::createDirectoryIfNotExists(CRAWLER_DIR);
+        //
     }
     
     /**
@@ -49,21 +40,6 @@ class Crawler
         }
         
         return $next->first();
-    }
-    
-    /**
-     * Get the path to the website archive file.
-     *
-     * @param Domain $domain Domain Model
-     * @return string Path to Archive
-     */
-    private function _getArchivePath(Domain $domain)
-    {
-        $dataDir = CRAWLER_DIR . '/' . $domain->getDomainStorageKey();
-        $archivePath = $dataDir . '/' . $domain->getDomainHash() . '.html';
-        FileUtils::createDirectoryIfNotExists($dataDir);
-        
-        return $archivePath;
     }
     
     /**
@@ -89,7 +65,7 @@ class Crawler
             return;
         }
         
-        $path = $this->_getArchivePath($domain);
+        $path = FileUtils::getArchivePath($domain);
         
         $fh = fopen($path, 'w');
         fwrite($fh, $contents);
@@ -105,7 +81,7 @@ class Crawler
      */
     private function _extractDomains(Domain $domain)
     {
-        $path = $this->_getArchivePath($domain);
+        $path = FileUtils::getArchivePath($domain);
         
         if (!file_exists($path)) {
             crocker_log('Error accessing ' . $path);

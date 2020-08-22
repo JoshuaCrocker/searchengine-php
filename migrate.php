@@ -4,33 +4,6 @@ require_once __DIR__ . '/bootstrap.php';
 
 use Illuminate\Database\Capsule\Manager as Capsule;
 
-//$domains = [
-//    'https://youtube.com',
-//    'https://facebook.com',
-//    'https://amazon.com',
-//    'https://live.com',
-//    'https://reddit.com',
-//    'https://zoom.us',
-//    'https://blogspot.com',
-//    'https://office.com',
-//    'https://instagram.com',
-//    'https://twitch.tv',
-//    'https://twitter.com',
-//    'https://microsoft.com',
-//    'https://worldometers.info',
-//    'https://stackoverflow.com',
-//];
-//
-//foreach ($domains as $domain)
-//{
-//    $d = new \Crockerio\SearchEngine\Database\Models\Domain();
-//    $d->domain = $domain;
-//    $d->last_crawl_time = null;
-//    $d->last_index_time = null;
-//    $d->save();
-//}
-//die();
-
 Capsule::connection()->getSchemaBuilder()::defaultStringLength(191);
 
 \Illuminate\Database\Schema\Builder::defaultStringLength(191);
