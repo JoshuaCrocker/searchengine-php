@@ -49,7 +49,9 @@ if (isset($_GET['q'])) {
         <?php
         foreach ($indices as $index) : ?>
             <li><?php
-                print $index->domain->domain; ?></li>
+                print $index->domain->domain; ?> (<?php
+                print $index->domain->id; ?>)
+            </li>
         <?php
         endforeach; ?>
     </ul>
