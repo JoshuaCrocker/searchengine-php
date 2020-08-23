@@ -9,7 +9,8 @@
 namespace Crockerio\SearchEngine\Engine;
 
 use Crockerio\SearchEngine\Database\Models\Word;
-use Crockerio\SearchEngine\Engine\Ranking\OccurrencesRanker;
+use Crockerio\SearchEngine\Engine\Filter\DuplicateFilter;
+use Crockerio\SearchEngine\Engine\Filter\OccurrencesRankingFilter;
 
 /**
  * Class Search
@@ -22,16 +23,21 @@ class Search
     /**
      * Ranker Instance.
      *
-     * @var OccurrencesRanker
+     * @var OccurrencesRankingFilter
      */
     private $ranker;
+    
+    private $filters;
     
     /**
      * Search constructor.
      */
     public function __construct()
     {
-        $this->ranker = new OccurrencesRanker();
+        $this->filters = [
+            new DuplicateFilter(),
+            new OccurrencesRankingFilter()
+        ];
     }
     
     /**
@@ -71,14 +77,17 @@ class Search
             $indices = $word->first()->indices;
             
             if ($indices->count() > 0) {
-                $this->ranker->rank($indices);
-                
                 foreach ($indices as $ind) {
                     $allIndices[] = $ind;
                 }
             }
         }
-        
+    
+        foreach ($this->filters as $filter) {
+            $allIndices = $filter->filter($allIndices);
+        }
+    
+    
         return $allIndices;
     }
 }

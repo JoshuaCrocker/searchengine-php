@@ -6,7 +6,7 @@
  * Copyright (C) 2020 Joshua Crocker
  */
 
-namespace Crockerio\SearchEngine\Engine\Ranking;
+namespace Crockerio\SearchEngine\Engine\Filter;
 
 use Illuminate\Support\Collection;
 
@@ -16,16 +16,16 @@ use Illuminate\Support\Collection;
  * @author Joshua Crocker
  * @package Crockerio\SearchEngine\Engine\Ranking
  */
-class OccurrencesRanker implements IRanker
+class OccurrencesRankingFilter implements IFilter
 {
     /**
      * Rank the indices by the number of occurrences.
      *
-     * @param Collection $indices The indices to sort.
+     * @param Collection $results The indices to sort.
      * @return Collection The sorted indices.
      */
-    public function rank($indices)
+    public function filter($results)
     {
-        return $indices->sortBy('occurrences');
+        return $results->sortBy('occurrences');
     }
 }
