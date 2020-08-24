@@ -774,16 +774,16 @@
         },
         {
             "name": "paquettg/php-html-parser",
-            "version": "3.0.0",
+            "version": "3.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/paquettg/php-html-parser.git",
-                "reference": "c116346b2fcc038d4ab6615f4328346a4eebf121"
+                "reference": "93ec62003ad6ebbe3136fa897e346aad7b377a0d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/paquettg/php-html-parser/zipball/c116346b2fcc038d4ab6615f4328346a4eebf121",
-                "reference": "c116346b2fcc038d4ab6615f4328346a4eebf121",
+                "url": "https://api.github.com/repos/paquettg/php-html-parser/zipball/93ec62003ad6ebbe3136fa897e346aad7b377a0d",
+                "reference": "93ec62003ad6ebbe3136fa897e346aad7b377a0d",
                 "shasum": ""
             },
             "require": {
@@ -829,7 +829,7 @@
                 "html",
                 "parser"
             ],
-            "time": "2020-07-19T18:28:37+00:00"
+            "time": "2020-08-23T18:59:19+00:00"
         },
         {
             "name": "paquettg/string-encode",
