@@ -18,23 +18,7 @@ if (isset($_GET['q'])) {
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Search Engine</title>
-    <style>
-        form {
-            width: 80%;
-            margin: 0 auto;
-        }
-
-        input {
-            width: 100%;
-            border: 1px solid #175b81;
-            padding: 8px;
-            font-size: 16pt;
-
-            -moz-border-radius: 8px;
-            -webkit-border-radius: 8px;
-            border-radius: 8px;
-        }
-    </style>
+    <link href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css" rel="stylesheet">
 </head>
 <body>
 <div>
