@@ -15,6 +15,7 @@ use Crockerio\SearchEngine\Database\Models\Index;
 use Crockerio\SearchEngine\Database\Models\Word;
 use Crockerio\SearchEngine\Logger\Logger;
 use Crockerio\SearchEngine\Utils\FileUtils;
+use GuzzleHttp\Exception\InvalidArgumentException;
 use PHPHtmlParser\Dom;
 
 use function GuzzleHttp\json_encode;
@@ -53,6 +54,10 @@ class Indexer
     private function _getPageContents(Domain $domain)
     {
         $path = FileUtils::getArchivePath($domain);
+        if (!file_exists($path)) {
+            Logger::getLogger()->debug('Archive doesn\'t exist ' . $path);
+            return;
+        }
         return file_get_contents($path);
     }
     
@@ -212,6 +217,7 @@ class Indexer
      * Index a domain.
      *
      * @param Domain $domain The domain to index.
+     * @throws InvalidArgumentException
      */
     private function _indexDomain(Domain $domain)
     {
@@ -223,6 +229,10 @@ class Indexer
         
         // Get the contents of the page
         $html = $this->_getPageContents($domain);
+        
+        if ($html == null || $html == '') {
+            return;
+        }
         
         // Store the document
         $document = $this->_extractDocumentData($html);
