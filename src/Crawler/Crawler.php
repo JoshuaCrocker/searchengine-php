@@ -10,6 +10,7 @@ namespace Crockerio\SearchEngine\Crawler;
 
 use Carbon\Carbon;
 use Crockerio\SearchEngine\Database\Models\Domain;
+use Crockerio\SearchEngine\Database\Models\Index;
 use Crockerio\SearchEngine\Http\UrlParser;
 use Crockerio\SearchEngine\Logger\Logger;
 use Crockerio\SearchEngine\Utils\FileUtils;
@@ -50,6 +51,17 @@ class Crawler
         return $next->first();
     }
     
+    private function _deleteDomain(Domain $domain)
+    {
+        // Delete indexes associated with the domain
+        Index::where('domain_id', '=', $domain->id)->each(function ($index) {
+            $index->delete();
+        });
+        
+        // Delete the domain
+        $domain->delete();
+    }
+    
     /**
      * Process the website.
      * Set the last crawled time to now and save the webpage.
@@ -70,6 +82,7 @@ class Crawler
         
         if (!$contents) {
             Logger::getLogger()->notice('Error accessing ' . $domain->domain);
+            $this->_deleteDomain($domain);
             return;
         }
         
