@@ -15,6 +15,9 @@ use Crockerio\SearchEngine\Database\Models\Index;
 use Crockerio\SearchEngine\Database\Models\Word;
 use Crockerio\SearchEngine\Logger\Logger;
 use Crockerio\SearchEngine\Utils\FileUtils;
+use PHPHtmlParser\Dom;
+
+use function GuzzleHttp\json_encode;
 
 /**
  * Class Indexer
@@ -56,28 +59,31 @@ class Indexer
     /**
      * Retrieve an alphabetical list of the words present in the document text.
      *
-     * @param $document string The document
+     * @param $document array The document
      * @return array Array of words and occurence counts.
      */
     private function _getConcordance($document)
     {
-        $words = explode(' ', $document);
         $wordCount = [];
         
-        foreach ($words as $word) {
-            $word = trim($word);
-            $validUTF8 = mb_check_encoding($word, 'UTF-8');
+        foreach ($document as $key => $value) {
+            $words = explode(' ', $value);
             
-            // For now, skip non-UTF-8 words
-            if (!$validUTF8) {
-                continue;
+            foreach ($words as $word) {
+                $word = trim($word);
+                $validUTF8 = mb_check_encoding($word, 'UTF-8');
+                
+                // For now, skip non-UTF-8 words
+                if (!$validUTF8) {
+                    continue;
+                }
+                
+                if (!isset($wordCount[$word])) {
+                    $wordCount[$word] = 0;
+                }
+                
+                $wordCount[$word]++;
             }
-            
-            if (!isset($wordCount[$word])) {
-                $wordCount[$word] = 0;
-            }
-            
-            $wordCount[$word]++;
         }
         
         return $wordCount;
@@ -86,25 +92,29 @@ class Indexer
     /**
      * Strip unneeded markup from the document.
      *
-     * @param $document string The raw document.
-     * @return string The tidied document.
+     * @param $document array The raw document.
+     * @return array The tidied document.
      */
     private function _cleanDocument($document)
     {
-        // Remove HTML from the document.
-        $document = strip_tags($document);
-        
-        // Remove punctuation from the document.
-        $document = preg_replace('/\p{P}/', ' ', $document);
-        
-        // Replace all multi-spaces with one space
-        $document = preg_replace('/\s\s+/', ' ', $document);
-        
-        // Remove non-word characters
-        $document = preg_replace('/\W/', ' ', $document);
-        
-        // Make the document lower case
-        $document = strtolower($document);
+        foreach ($document as $key => $value) {
+            // Remove HTML from the document.
+            $value = strip_tags($value);
+            
+            // Remove punctuation from the document.
+            $value = preg_replace('/\p{P}/', ' ', $value);
+            
+            // Replace all multi-spaces with one space
+            $value = preg_replace('/\s\s+/', ' ', $value);
+            
+            // Remove non-word characters
+            $value = preg_replace('/\W/', ' ', $value);
+            
+            // Make the document lower case
+            $value = strtolower($value);
+            
+            $document[$key] = $value;
+        }
         
         return $document;
     }
@@ -152,6 +162,52 @@ class Indexer
         ]);
     }
     
+    private function _getDocumentTitle($document)
+    {
+        $title = '';
+        
+        $dom = new Dom();
+        $dom->loadStr($document);
+        $eTitle = $dom->find('title')[0];
+        
+        if (null != $eTitle) {
+            $title = $eTitle->innerHtml;
+        }
+        
+        return $title;
+    }
+    
+    private function _getDocumentMetaTags($document)
+    {
+        $output = [];
+        
+        $dom = new Dom();
+        $dom->loadStr($document);
+        $tags = $dom->find('meta');
+        
+        foreach ($tags as $tag) {
+            $output[$tag->getAttribute('name')] = $tag->getAttribute('content');
+        }
+        
+        return $output;
+    }
+    
+    private function _extractDocumentData($document)
+    {
+        $output = [];
+        
+        $output['title'] = $this->_getDocumentTitle($document);
+        $meta = $this->_getDocumentMetaTags($document);
+        
+        foreach ($meta as $type => $value) {
+            if (trim($type) != '') {
+                $output['meta_' . $type] = $value;
+            }
+        }
+        
+        return $output;
+    }
+    
     /**
      * Index a domain.
      *
@@ -166,13 +222,15 @@ class Indexer
         $domain->save();
         
         // Get the contents of the page
-        $document = $this->_getPageContents($domain);
+        $html = $this->_getPageContents($domain);
         
         // Store the document
-        $documentId = $this->_storeDocument($document);
+        $document = $this->_extractDocumentData($html);
+        $document['url'] = $domain->domain;
+        $documentId = $this->_storeDocument(json_encode($document));
         
         // Generate the keywords list
-        $document = $this->_cleanDocument($document);
+        $html = $this->_cleanDocument($document);
         $concordance = $this->_getConcordance($document);
         
         // Save to the index
